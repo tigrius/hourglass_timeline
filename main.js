@@ -27,7 +27,7 @@ function setup(){
 
 function scrolled(event){
     console.log("Scrolled");
-    scrollAmount += event.deltaY;
+    scrollAmount -= event.deltaY;
     const deltaT = scrollAmount / 240;
     background(50);
     drawHyperbola();
