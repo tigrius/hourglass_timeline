@@ -1,6 +1,7 @@
 let canvas;
 const curve_vertex = 100;
-const waist_width = 100;
+const waist_width = 50;
+const left_side = 200;
 const slope = 1.5;
 const pointness = 0.05;
 const textMargin = 50;
@@ -8,7 +9,7 @@ const textSharpness = 0.25;
 let maxWidth = 0;
 let maxHeight = 0;
 let scrollAmount = 0;
-const textLists = ["2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025", "2026", "2027", "2028", "2029", "2030","2031","2032","2034","2035","2036","2037","2038","2039","2040","2041","2042","2043","2044","2045","2046","2047","2048","2049","2050"];
+const textLists = ["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025", "2026", "2027", "2028", "2029", "2030","2031","2032","2034","2035","2036","2037","2038","2039","2040","2041","2042","2043","2044","2045","2046","2047","2048","2049","2050"];
 
 let touch_y_pos = 0;
 let touch_deltaY = 0;
@@ -38,8 +39,8 @@ function scrolled(event, isMobile){
         deltaY = event.deltaY;
     }
     console.log("Scrolled");
-    scrollAmount -= deltaY;
-    const deltaT = scrollAmount / 240;
+    scrollAmount -= deltaY/240;
+    const deltaT = scrollAmount;
     background(50);
     drawHyperbola();
     alignText(textLists, deltaT);
@@ -60,6 +61,13 @@ function draw(){
 }
 
 function drawHyperbola(){
+    const upperHeight = maxHeight/2 - Math.max(maxHeight*Math.tanh(0.04*scrollAmount)/2,0);
+    fill(100);
+    noStroke();
+    rect(0, maxHeight/2 + upperHeight, maxWidth, maxHeight);
+    rect(0, maxHeight/2 - upperHeight,maxWidth, upperHeight);
+    rect(maxWidth - left_side, maxHeight/2-1, waist_width, maxHeight);
+
     const maxt = Math.ceil(calcTfromY(maxWidth / 2));
     //noFill();
     fill(10);
@@ -72,6 +80,14 @@ function drawHyperbola(){
         const deltax = calcXfromT(t);
         const deltay = calcYfromT(t);
         curveVertex(maxWidth - deltax, maxHeight / 2 + deltay);
+    }
+    endShape();
+    beginShape();
+    for(let i = curve_vertex; i >= -curve_vertex; i--){
+        const t = maxt/curve_vertex * i;
+        const deltax = calcXfromT(t);
+        const deltay = calcYfromT(t);
+        curveVertex(maxWidth + deltax - 2*left_side + waist_width, maxHeight / 2 - deltay);
     }
  
     endShape();
@@ -91,13 +107,22 @@ function putText(textContent,t){
 }
 
 function alignText(textArray, deltaT){
+    dT = deltaT;
+    if(deltaT > textArray.length -1){
+        dT = textArray.length-1;
+        scrollAmount = textArray.length-1;
+    }
+    if(deltaT < 0){
+        dT = 0;
+        scrollAmount = 0;
+    }
     for(let i = 0; i < textArray.length; i++){
-        putText(textArray[i], deltaT + i);
+        putText(textArray[i], dT - i);
     }
 }
 
 function calcXfromY(y){
-    return Math.sqrt(1/(pointness**2 * slope**4)+y**2/(slope**2)) - 1/(pointness * slope**2) + waist_width;
+    return Math.sqrt(1/(pointness**2 * slope**4)+y**2/(slope**2)) - 1/(pointness * slope**2) + left_side;
 }
 
 function calcYfromT(t){
@@ -105,7 +130,7 @@ function calcYfromT(t){
 }
 
 function calcXfromT(t){
-    return (Math.cosh(t) - 1)/(pointness * slope**2) + waist_width;
+    return (Math.cosh(t) - 1)/(pointness * slope**2) + left_side;
 }
 
 function calcTfromY(y){
