@@ -10,11 +10,14 @@ let maxHeight = 0;
 let scrollAmount = 0;
 const textLists = ["2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025", "2026", "2027", "2028", "2029", "2030","2031","2032","2034","2035","2036","2037","2038","2039","2040"];
 
-
+let touch_y_pos = 0;
+let touch_deltaY = 0;
 
 function setup(){
-    document.addEventListener('wheel', scrolled);
-    document.addEventListener('touchmove', scrolled);
+    document.addEventListener('wheel', function(event){scrolled(event, false);});
+    document.addEventListener('touchmove', function(event){scrolled(event, true);});
+    document.addEventListener('touchstart', touch_start);
+    document.addEventListener('touchend', touch_end);
     maxHeight = window.innerHeight;
     maxWidth = window.innerWidth;
     canvas = createCanvas(maxWidth, maxHeight);
@@ -25,14 +28,31 @@ function setup(){
     noLoop(); // Stop draw loop
 }
 
-function scrolled(event){
+function scrolled(event, isMobile){
+    let deltaY;
+    if (isMobile){
+        touch_deltaY = event.touches[0].clientY - touch_y_pos;
+        touch_y_pos = event.touches[0].clientY;
+        deltaY = touch_deltaY;
+    }else{
+        deltaY = event.deltaY;
+    }
     console.log("Scrolled");
-    scrollAmount -= event.deltaY;
+    scrollAmount -= deltaY;
     const deltaT = scrollAmount / 240;
     background(50);
     drawHyperbola();
     alignText(textLists, deltaT);
     
+}
+
+function touch_start(event){
+    touch_y_pos = event.touches[0].clientY;
+}
+
+function touch_end(event){
+    touch_deltaY = 0;
+    touch_y_pos = event.touches[0].clientY;
 }
 
 function draw(){
