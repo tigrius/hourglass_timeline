@@ -1,6 +1,6 @@
 let canvas;
 const curve_vertex = 100;
-const waist_width = 50;
+const waist_width = 10;
 const left_side = 200;
 const slope = 1.5;
 const pointness = 0.05;
