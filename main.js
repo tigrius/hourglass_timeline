@@ -33,7 +33,7 @@ function scrolled(event, isMobile){
     if (isMobile){
         touch_deltaY = event.touches[0].clientY - touch_y_pos;
         touch_y_pos = event.touches[0].clientY;
-        deltaY = touch_deltaY;
+        deltaY = -touch_deltaY;
     }else{
         deltaY = event.deltaY;
     }
@@ -75,6 +75,8 @@ function drawHyperbola(){
     }
  
     endShape();
+    noStroke();
+    rect(0,0,maxWidth - calcXfromY(maxHeight/2), maxHeight);
 
 }
 
